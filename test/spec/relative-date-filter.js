@@ -8,8 +8,8 @@ describe('Filter: relativeDate', function() {
       $provide.value('now', NOW)
     })
 
-    inject(function(_$filter_) {
-      relativeDate = _$filter_('relativeDate')
+    inject(function($filter) {
+      relativeDate = $filter('relativeDate')
     })
   })
 
@@ -36,7 +36,7 @@ describe('Filter: relativeDate', function() {
     expect(relativeDate('2013-09-06T12:00:00Z')).toEqual('yesterday')
     expect(relativeDate('2013-09-06T00:00:00Z')).toEqual('yesterday')
     expect(relativeDate('2013-09-05T22:59:59Z')).toEqual('2 days ago')
-    expect(relativeDate('2013-09-01')).toEqual('6 days ago')
+    expect(relativeDate('2013-09-01T12:00:00Z')).toEqual('6 days ago')
     expect(relativeDate('2013-08-31')).toEqual('a week ago')
     expect(relativeDate('2013-08-09')).toEqual('4 weeks ago')
     expect(relativeDate('2013-08-08')).toEqual('a month ago')
@@ -67,89 +67,111 @@ describe('Filter: relativeDate', function() {
     expect(relativeDate('2014-09-07T12:00:00Z')).toEqual('a year from now')
     expect(relativeDate('2015-01-07T12:00:00Z')).toEqual('a year from now')
     expect(relativeDate('2015-10-07T12:00:00Z')).toEqual('over a year from now')
-  })
-})
+  });
+});
 
 describe('Filter: relativeDate', function() {
-  var relativeDate
+  var relativeDate;
 
   beforeEach(function() {
-    module('relativeDate')
+    module('relativeDate');
 
     inject(function(_$filter_) {
-      relativeDate = _$filter_('relativeDate')
-    })
-  })
+      relativeDate = _$filter_('relativeDate');
+    });
+  });
 
   it('Updates the value of NOW', function() {
     // Create a date 29 seconds ago (30 is the "just now" cutoff)
-    var now = new Date(new Date() - 29000)
-    var flag
+    var now = new Date(new Date() - 29000);
+    var flag;
 
-    expect(relativeDate(now)).toEqual('just now')
+    expect(relativeDate(now)).toEqual('just now');
 
     runs(function() {
       setTimeout(function() {
-        flag = true
-      }, 1001)
-    })
+        flag = true;
+      }, 1001);
+    });
 
     waitsFor(function() {
-      return flag
-    })
+      return flag;
+    });
 
     runs(function() {
-      expect(relativeDate(now)).toEqual('30 seconds ago')
-    })
-  })
-})
+      expect(relativeDate(now)).toEqual('30 seconds ago');
+    });
+  });
+});
 
 describe('Filter: relativeDate', function() {
-  var relativeDate
+  var relativeDate;
 
   beforeEach(function() {
     module('relativeDate', function($provide) {
-      $provide.value('now', NOW)
+      $provide.value('now', NOW);
       $provide.value('relativeDateTranslations', {
         weeks_ago: '{{time}}週間前',
         a_year_ago: '一年前',
         hours_from_now: '{{time}}時間今から'
-      })
-    })
+      });
+    });
 
     inject(function(_$filter_) {
-      relativeDate = _$filter_('relativeDate')
-    })
-  })
+      relativeDate = _$filter_('relativeDate');
+    });
+  });
 
   it('Performs simple translations', function() {
-    expect(relativeDate('2013-08-09')).toEqual('4週間前')
-    expect(relativeDate('2012-09-07')).toEqual('一年前')
-    expect(relativeDate('2013-09-07T14:00:00Z')).toEqual('2時間今から')
-  })
-})
+    expect(relativeDate('2013-08-09')).toEqual('4週間前');
+    expect(relativeDate('2012-09-07')).toEqual('一年前');
+    expect(relativeDate('2013-09-07T14:00:00Z')).toEqual('2時間今から');
+  });
+});
 
 describe('Filter: relativeDate', function() {
-  var $scope
+  var $scope;
 
   beforeEach(function() {
     module('myApp', function($provide) {
-      $provide.value('now', NOW)
-    })
+      $provide.value('now', NOW);
+    });
 
     inject(function($rootScope, $controller, $filter) {
-      $scope = $rootScope.$new()
+      $scope = $rootScope.$new();
       $controller('TestCtrl', {
         $scope: $scope
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('Integration with angular-translate', function() {
     it('Uses angular-translate when available', function() {
-      expect($scope.fourWeeksAgo).toEqual('4週間前')
-      expect($scope.aYearAgo).toEqual('一年前')
-      expect($scope.twoHoursFromNow).toEqual('2時間今から')
-    })
-  })
-})
+      expect($scope.fourWeeksAgo).toEqual('4週間前');
+      expect($scope.aYearAgo).toEqual('一年前');
+      expect($scope.twoHoursFromNow).toEqual('2時間今から');
+    });
+  });
+});
+
+describe('Filter: relativeDate', function() {
+  var relativeDate;
+
+  beforeEach(function() {
+    module('relativeDate')
+    inject(function($filter) {
+      relativeDate = $filter('relativeDate');
+    });
+  });
+
+  it('Uses additional parameter to modify value of Now', function() {
+    expect(relativeDate(NOW, '2012-09-07T12:00:00Z')).toEqual('a year from now');
+    expect(relativeDate(NOW, '2014-09-07T12:00:00Z')).toEqual('a year ago');
+    expect(relativeDate(NOW, '2013-10-07T12:00:00Z')).toEqual('a month ago');
+    expect(relativeDate(NOW, '2013-08-07T12:00:00Z')).toEqual('a month from now');
+    expect(relativeDate(NOW, '2013-09-08T12:00:00Z')).toEqual('yesterday');
+    expect(relativeDate(NOW, '2013-09-06T12:00:00Z')).toEqual('tomorrow');
+    expect(relativeDate(NOW, '2013-09-07T12:30:00Z')).toEqual('30 minutes ago');
+    expect(relativeDate(NOW, '2013-09-07T11:30:00Z')).toEqual('30 minutes from now');
+  });
+});

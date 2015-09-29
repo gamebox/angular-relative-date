@@ -47,8 +47,9 @@ angular.module('relativeDate', [])
     calculateDelta = (now, date) ->
       Math.round(Math.abs(now - date) / 1000)
 
-    (date) ->
+    (date, nowValue) ->
       now = if _now then _now else new Date()
+      now = if nowValue then new Date(nowValue) else now
       date = new Date(date) unless date instanceof Date
       delta = null
 
@@ -63,7 +64,7 @@ angular.module('relativeDate', [])
 
       if delta > day && delta < week
         # We're dealing with days now, so time becomes irrelevant
-        date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
+        date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0)
         delta = calculateDelta(now, date)
 
       translate = (translatePhrase, timeValue) ->

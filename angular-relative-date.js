@@ -45,9 +45,10 @@
       calculateDelta = function(now, date) {
         return Math.round(Math.abs(now - date) / 1000);
       };
-      return function(date) {
+      return function(date, nowValue) {
         var day, delta, hour, minute, month, now, translate, week, year;
         now = _now ? _now : new Date();
+        now = nowValue ? new Date(nowValue) : now;
         if (!(date instanceof Date)) {
           date = new Date(date);
         }
@@ -60,7 +61,7 @@
         year = day * 365;
         delta = calculateDelta(now, date);
         if (delta > day && delta < week) {
-          date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+          date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0);
           delta = calculateDelta(now, date);
         }
         translate = function(translatePhrase, timeValue) {
